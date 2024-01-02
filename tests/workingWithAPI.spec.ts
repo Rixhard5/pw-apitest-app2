@@ -9,11 +9,6 @@ test.beforeEach(async ({page}) => {
   });
 
   await page.goto('https://angular.realworld.how/');
-
-  await page.getByText('Sign in').click();
-  await page.getByRole('textbox', {name: "Email"}).fill('pwtest15@test.com');
-  await page.getByRole('textbox', {name: "Password"}).fill('pwtest15');
-  await page.getByRole('button').click();
 });
 
 test('has title', async ({page}) => {
