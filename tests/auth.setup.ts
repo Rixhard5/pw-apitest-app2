@@ -1,15 +1,20 @@
-import {test as setup} from '@playwright/test';
+import {test as setup} from "@playwright/test";
+import user from '../.auth/user.json';
+import fs from 'fs';
 
-const authFile = '.auth/user.json';
+const authFile = ".auth/user.json";
 
-setup('authentication',async ({page}) => {
-    await page.goto('https://angular.realworld.how/');
+setup("authentication", async ({request}) => {
+    const response = await request.post("https://api.realworld.io/api/users/login", {
+        data: {
+            "user":{"email":"pwtest15@test.com","password":"pwtest15"}
+        }
+    });
+    const responseBody = await response.json();
+    const accessToken = responseBody.user.token;
+    user.origins[0].localStorage[0].value = accessToken;
+    fs.writeFileSync(authFile, JSON.stringify(user));
 
-    await page.getByText('Sign in').click();
-    await page.getByRole('textbox', {name: "Email"}).fill('pwtest15@test.com');
-    await page.getByRole('textbox', {name: "Password"}).fill('pwtest15');
-    await page.getByRole('button').click();
-    await page.waitForResponse('https://api.realworld.io/api/tags');
+    process.env['ACCESS_TOKEN'] = accessToken;
 
-    await page.context().storageState({path: authFile});
 });
